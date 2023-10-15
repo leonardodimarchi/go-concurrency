@@ -6,19 +6,12 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
+	"sync"
 
 	"github.com/joho/godotenv"
 )
 
 var apiKey string
-
-type WeatherInfo struct {
-	Main    string
-	Details struct {
-		Temperature float64
-	}
-}
 
 func init() {
 	err := godotenv.Load()
@@ -30,7 +23,12 @@ func init() {
 	apiKey = os.Getenv("API_KEY")
 }
 
-func fetchWeatherInfo(city string) (WeatherInfo, error) {
+
+func fetchWeatherInfoAsync(city string, channel chan<- WeatherInfo, waitGroup *sync.WaitGroup) (WeatherInfo, error) {
+	if waitGroup != nil {
+		defer waitGroup.Done()
+	}
+
 	url := fmt.Sprintf("https://api.openweathermap.org/data/2.5/weather?units=metric&q=%s&appid=%s", city, apiKey)
 
 	response, err := http.Get(url)
@@ -56,22 +54,14 @@ func fetchWeatherInfo(city string) (WeatherInfo, error) {
 	}
 
 	weatherInfo := WeatherInfo{
+		City: city,
 		Main: data.Weather[0].Main,
 	}
 	weatherInfo.Details.Temperature = data.Main.Temperature
 
-	return weatherInfo, nil
-}
-
-func main() {
-	start := time.Now()
-
-	cities := []string{"Sorocaba", "São Paulo", "Paraná", "Itu"}
-
-	for _, city := range cities {
-		weather, _ := fetchWeatherInfo(city)
-		fmt.Println("Data for "+city, weather)
+	if channel != nil {
+		channel <- weatherInfo
 	}
 
-	fmt.Println("\nTook: " + time.Since(start).String())
+	return weatherInfo, nil
 }

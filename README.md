@@ -22,6 +22,8 @@ To run the program you will need a `.env` file containing a api key from [open w
 API_KEY=<KEY>
 ```
 
+Then, you can use `go run *.go` to compile and run the program
+
 ## Results
 
 ```

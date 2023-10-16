@@ -1,5 +1,7 @@
 # Golang Concurrency
 
+This is just a case study for me to experiment some of golang concurrency features.
+
 ## What i've used
 
 ### Goroutines
@@ -22,7 +24,7 @@ To run the program you will need a `.env` file containing a api key from [open w
 API_KEY=<KEY>
 ```
 
-Then, you can use `go run *.go` to compile and run the program
+Then, you can use `go run *.go` to compile and run the program.
 
 ## Results
 
